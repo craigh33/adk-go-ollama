@@ -98,6 +98,9 @@ func partsFromMessage(msg *ollamaapi.Message) []*genai.Part {
 
 // FunctionCallFromToolCall converts an Ollama ToolCall to a genai FunctionCall.
 func FunctionCallFromToolCall(tc *ollamaapi.ToolCall) *genai.FunctionCall {
+	if tc == nil {
+		return nil
+	}
 	return &genai.FunctionCall{
 		ID:   tc.ID,
 		Name: tc.Function.Name,

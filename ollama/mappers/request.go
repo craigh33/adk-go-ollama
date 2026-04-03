@@ -149,14 +149,19 @@ func userContentToMessages(c *genai.Content) ([]ollamaapi.Message, error) {
 	}
 
 	var out []ollamaapi.Message
+	out = append(out, toolMsgs...)
 	if len(texts) > 0 || len(images) > 0 {
 		out = append(out, ollamaapi.Message{
 			Role:    ollamaRoleUser,
 			Content: strings.Join(texts, "\n"),
 			Images:  images,
 		})
+	} else if len(toolMsgs) > 0 {
+		out = append(out, ollamaapi.Message{
+			Role:    ollamaRoleUser,
+			Content: "Continue processing previous requests as instructed. Exit or provide a summary if no more outputs are needed.",
+		})
 	}
-	out = append(out, toolMsgs...)
 	return out, nil
 }
 

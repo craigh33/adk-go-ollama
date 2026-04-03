@@ -41,10 +41,9 @@ type options struct {
 }
 
 // WithBaseURL sets the Ollama server URL. Defaults to http://localhost:11434.
-func WithBaseURL(rawURL string) Option {
+func WithBaseURL(u *url.URL) Option {
 	return func(o *options) {
-		u, err := url.Parse(rawURL)
-		if err == nil {
+		if u != nil {
 			o.baseURL = u
 		}
 	}
