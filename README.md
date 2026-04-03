@@ -84,6 +84,7 @@ Each example has its own `README.md` and `Makefile`:
 
 - [`examples/ollama-chat`](examples/ollama-chat): runner-based chat example.
 - [`examples/ollama-tool-calling`](examples/ollama-tool-calling): tool-calling agent example with function declarations.
+- [`examples/ollama-imagegen`](examples/ollama-imagegen): image generation via `z-image` using ADK's tools.
 - [`examples/ollama-stream`](examples/ollama-stream): direct streaming example using `GenerateContent(..., true)`.
 - [`examples/ollama-multimodal`](examples/ollama-multimodal): image analysis and multi-image comparison using vision models like `llava`.
 - [`examples/ollama-web-ui`](examples/ollama-web-ui): ADK local web UI launcher to interact with your Ollama agent.
@@ -116,6 +117,7 @@ make -C examples/ollama-stream run
 
 - **Unsupported features**: Tool variants not supported by Ollama cause a request-time error. Advanced features that don't map cleanly may be ignored or return an explicit ADK error.
 - **Multimodal Content**: Ollama natively only supports base64-encoded images. While the ADK can handle arbitrary blobs natively (like PDFs, Documents, or Spreadsheets), the `adk-go-ollama` provider will only process `genai.InlineData` as images via a vision model. Arbitrary file attachments are ignored or rejected by the Ollama API.
+- **Image Generation**: Ollama's image generation feature currently only supports macOS and `z-image` (based on Flux architectures) and requires a large memory footprint (~12GB). It only supports single image generation requests at a fixed step count natively via `/v1/images/generations`.
 
 ## License
 
