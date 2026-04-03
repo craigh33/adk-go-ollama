@@ -232,29 +232,39 @@ func toolsFromGenai(cfg *genai.GenerateContentConfig) ollamaapi.Tools {
 func functionParametersToOllama(fd *genai.FunctionDeclaration) ollamaapi.ToolFunctionParameters {
 	// Prefer JSON schema if provided.
 	if fd.ParametersJsonSchema != nil {
-		return jsonRoundTrip[ollamaapi.ToolFunctionParameters](fd.ParametersJsonSchema)
+		if out, err := jsonRoundTrip[ollamaapi.ToolFunctionParameters](fd.ParametersJsonSchema); err == nil {
+			return out
+		}
 	}
 	if fd.Parameters != nil {
-		b, err := json.Marshal(fd.Parameters)
-		if err == nil {
-			var m map[string]any
-			if err := json.Unmarshal(b, &m); err == nil {
-				normalizeSchemaTypes(m)
-				return jsonRoundTrip[ollamaapi.ToolFunctionParameters](m)
-			}
+		if out, err := parseMapParameters(fd.Parameters); err == nil {
+			return out
 		}
 	}
 	return ollamaapi.ToolFunctionParameters{Type: "object"}
 }
 
-func jsonRoundTrip[T any](v any) T {
+func parseMapParameters(v any) (ollamaapi.ToolFunctionParameters, error) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return ollamaapi.ToolFunctionParameters{}, err
+	}
+	var m map[string]any
+	if err := json.Unmarshal(b, &m); err != nil {
+		return ollamaapi.ToolFunctionParameters{}, err
+	}
+	normalizeSchemaTypes(m)
+	return jsonRoundTrip[ollamaapi.ToolFunctionParameters](m)
+}
+
+func jsonRoundTrip[T any](v any) (T, error) {
 	var out T
 	b, err := json.Marshal(v)
 	if err != nil {
-		return out
+		return out, err
 	}
-	_ = json.Unmarshal(b, &out)
-	return out
+	err = json.Unmarshal(b, &out)
+	return out, err
 }
 
 // normalizeSchemaTypes recursively lowercases every "type" field value in a
