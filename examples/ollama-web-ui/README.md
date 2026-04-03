@@ -5,7 +5,7 @@ This example demonstrates how to launch the ADK Web UI locally using the Ollama 
 ## Prerequisites
 
 - [Ollama](https://ollama.com/) running locally or accessible on your network
-- An Ollama model installed locally (e.g. `gemma3`)
+- An Ollama model installed locally (e.g. `gemma3:1b`)
 
 ## Run
 

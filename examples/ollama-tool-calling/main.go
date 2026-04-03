@@ -61,8 +61,8 @@ func main() {
 
 	modelName := os.Getenv("OLLAMA_MODEL")
 	if modelName == "" {
-		log.Println("OLLAMA_MODEL is not set, defaulting to gemma3")
-		modelName = "gemma3"
+		log.Println("OLLAMA_MODEL is not set, defaulting to gemma3:1b")
+		modelName = "gemma3:1b"
 	}
 
 	llm, err := ollama.New(modelName)

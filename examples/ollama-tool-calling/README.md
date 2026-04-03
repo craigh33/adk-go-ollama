@@ -12,7 +12,7 @@ This example demonstrates tool calling with the Ollama provider using function d
 ## Prerequisites
 
 - [Ollama](https://ollama.com/) running locally or accessible on your network
-- An Ollama model installed locally that supports tool calling (e.g. `gemma3`, `llama3.1`, `mistral`)
+- An Ollama model installed locally that supports tool calling (e.g. `gemma3:1b`, `llama3.1`, `mistral`)
 
 ## Run
 
@@ -26,7 +26,7 @@ Or pass a custom question:
 make -C examples/ollama-tool-calling run PROMPT='What is the weather in London?'
 ```
 
-You can optionally override the default model (`gemma3`) by setting `OLLAMA_MODEL`:
+You can optionally override the default model (`gemma3:1b`) by setting `OLLAMA_MODEL`:
 
 ```bash
 OLLAMA_MODEL=mistral make -C examples/ollama-tool-calling run
