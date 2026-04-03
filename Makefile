@@ -1,5 +1,9 @@
 .PHONY: pre-commit-install pre-commit test build lint
 
+# Installs tools defined in Brewfile
+brew-install:
+	brew bundle install
+
 # Install pre-commit hooks (requires pre-commit to be installed).
 pre-commit-install:
 	$(MAKE) pre-commit
