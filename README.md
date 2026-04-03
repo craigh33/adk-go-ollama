@@ -115,6 +115,7 @@ make -C examples/ollama-stream run
 ## Limitations
 
 - **Unsupported features**: Tool variants not supported by Ollama cause a request-time error. Advanced features that don't map cleanly may be ignored or return an explicit ADK error.
+- **Multimodal Content**: Ollama natively only supports base64-encoded images. While the ADK can handle arbitrary blobs natively (like PDFs, Documents, or Spreadsheets), the `adk-go-ollama` provider will only process `genai.InlineData` as images via a vision model. Arbitrary file attachments are ignored or rejected by the Ollama API.
 
 ## License
 

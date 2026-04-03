@@ -183,8 +183,8 @@ func main() {
 
 	modelName := os.Getenv("OLLAMA_MODEL")
 	if modelName == "" {
-		log.Println("OLLAMA_MODEL is not set, using default 'llava'")
-		modelName = "llava"
+		log.Println("OLLAMA_MODEL is not set, using default 'gemma3:4b'")
+		modelName = "gemma3:4b"
 	}
 
 	imageURL := os.Getenv("IMAGE_URL")
