@@ -192,7 +192,7 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	httpResp, err := t.httpClient.Do(httpReq) //nolint:gosec // trusted BaseURL
+	httpResp, err := t.httpClient.Do(httpReq) //nolint:gosec,nolintlint // trusted BaseURL
 	if err != nil {
 		return nil, fmt.Errorf("do http request: %w", err)
 	}
