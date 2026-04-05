@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"strings"
 
 	"google.golang.org/adk/model"
 	"google.golang.org/adk/tool"
@@ -26,7 +27,7 @@ const DefaultBaseURL = "http://localhost:11434"
 // Config configures the image generator tool.
 type Config struct {
 	BaseURL    string // e.g., "http://localhost:11434"
-	ModelID    string // e.g., "z-image"
+	ModelID    string // e.g., "x/flux2-klein:4b"
 	HTTPClient *http.Client
 }
 
@@ -130,6 +131,8 @@ func (t *imageGenTool) ProcessRequest(_ tool.Context, req *model.LLMRequest) err
 
 // Run executes the image generation tool: invokes Ollama's /v1/images/generations endpoint,
 // then persists the resulting image as an artifact via Artifacts().Save.
+//
+//nolint:funlen // Tool execution coordinates multiple steps
 func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	m, ok := args.(map[string]any)
 	if !ok {
@@ -141,7 +144,13 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 		return nil, errors.New("prompt is required")
 	}
 	fileName, _ := m["file_name"].(string)
-	if fileName == "" {
+	fileName = strings.TrimSpace(fileName)
+	if fileName != "" {
+		base := filepath.Base(fileName)
+		if base != fileName || base == "." || base == string(filepath.Separator) {
+			return nil, errors.New("invalid file_name provided")
+		}
+	} else {
 		fileName = "generated_image.png"
 	}
 	mimeType := mime.TypeByExtension(filepath.Ext(fileName))
