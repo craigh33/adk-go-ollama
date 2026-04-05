@@ -42,6 +42,14 @@ func New(cfg Config) (tool.Tool, error) {
 	if cfg.BaseURL == "" {
 		cfg.BaseURL = DefaultBaseURL
 	}
+	u, err := url.Parse(cfg.BaseURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid BaseURL: %w", err)
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return nil, errors.New("BaseURL must use http or https scheme")
+	}
+
 	if cfg.ModelID == "" {
 		cfg.ModelID = DefaultModelID
 	}

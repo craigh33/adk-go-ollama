@@ -144,6 +144,26 @@ func verifySuccess(t *testing.T, resp map[string]any, mArt *mockArtifacts) {
 	}
 }
 
+func TestNew(t *testing.T) {
+	_, err := New(Config{BaseURL: "ftp://localhost"})
+	if err == nil {
+		t.Error("expected error for ftp scheme, got nil")
+	}
+
+	_, err = New(Config{BaseURL: "::broken:url://"})
+	if err == nil {
+		t.Error("expected error for parser failure, got nil")
+	}
+
+	toolImpl, err := New(Config{BaseURL: "http://localhost:11434"})
+	if err != nil {
+		t.Errorf("unexpected error for valid URL: %v", err)
+	}
+	if toolImpl == nil {
+		t.Error("expected tool to be non-nil")
+	}
+}
+
 func TestRun(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(mockServerHandler))
 	defer ts.Close()
