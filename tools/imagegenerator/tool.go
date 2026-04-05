@@ -72,18 +72,18 @@ func (t *imageGenTool) Declaration() *genai.FunctionDeclaration {
 		Name:        t.Name(),
 		Description: t.Description(),
 		Parameters: &genai.Schema{
-			Type: "OBJECT",
+			Type: "object",
 			Properties: map[string]*genai.Schema{
 				"prompt": {
-					Type:        "STRING",
+					Type:        "string",
 					Description: "The text prompt describing the image to generate",
 				},
 				"file_name": {
-					Type:        "STRING",
+					Type:        "string",
 					Description: "The filename to save the generated image as (e.g. 'landscape.png')",
 				},
 				"size": {
-					Type:        "STRING",
+					Type:        "string",
 					Description: "Image dimensions (WxH). Defaults to 1024x1024.",
 				},
 			},

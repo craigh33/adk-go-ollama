@@ -148,10 +148,13 @@ func TestRun(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(mockServerHandler))
 	defer ts.Close()
 
-	toolImpl, _ := New(Config{
+	toolImpl, err := New(Config{
 		BaseURL:    ts.URL,
 		HTTPClient: ts.Client(),
 	})
+	if err != nil {
+		t.Fatalf("New() failed: %v", err)
+	}
 
 	tests := []struct {
 		name        string
