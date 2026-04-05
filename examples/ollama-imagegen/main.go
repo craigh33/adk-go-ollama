@@ -4,7 +4,7 @@
 //	go run ./examples/ollama-imagegen
 //
 // Note: Requires an Ollama version built with image generation support
-// and the 'z-image' model pulled.
+// and the 'x/flux2-klein:4b' model pulled.
 package main
 
 import (
@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"google.golang.org/adk/agent"
 	"google.golang.org/adk/agent/llmagent"
@@ -80,7 +81,7 @@ func main() {
 
 	userMsg := "Can you draw me a sunset over the mountains and save it as sunset.png?"
 	if len(os.Args) > 1 {
-		userMsg = os.Args[1]
+		userMsg = strings.Join(os.Args[1:], " ")
 	}
 
 	fmt.Printf("User: %s\n\n", userMsg)

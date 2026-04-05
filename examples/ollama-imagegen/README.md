@@ -1,6 +1,6 @@
 # Ollama Image Generation Example
 
-This example demonstrates how an ADK agent can autonomously generate images using the local Ollama image generation feature. It uses a text model for reasoning (e.g., `qwen3`) and tools an agent to draw images via the `x/flux2-klein:4b` imagegen model.
+This example demonstrates how an ADK agent can autonomously generate images using the local Ollama image generation feature. It uses a text model for reasoning (e.g., `qwen3`) and uses an agent tool to draw images via the `x/flux2-klein:4b` imagegen model.
 
 ## Requirements
 

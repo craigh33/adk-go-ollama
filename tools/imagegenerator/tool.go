@@ -7,7 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
+	"net/url"
+	"path/filepath"
 
 	"google.golang.org/adk/model"
 	"google.golang.org/adk/tool"
@@ -141,6 +144,10 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	if fileName == "" {
 		fileName = "generated_image.png"
 	}
+	mimeType := mime.TypeByExtension(filepath.Ext(fileName))
+	if mimeType == "" {
+		mimeType = "image/png"
+	}
 	size, _ := m["size"].(string)
 	if size == "" {
 		size = "1024x1024"
@@ -158,14 +165,17 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
 
-	url := t.baseURL + "/v1/images/generations"
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(reqBytes))
+	reqURL, err := url.JoinPath(t.baseURL, "/v1/images/generations")
+	if err != nil {
+		return nil, fmt.Errorf("invalid base url: %w", err)
+	}
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, bytes.NewReader(reqBytes))
 	if err != nil {
 		return nil, fmt.Errorf("create http request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	httpResp, err := t.httpClient.Do(httpReq) // #nosec G704
+	httpResp, err := t.httpClient.Do(httpReq) //nolint:gosec,nolintlint // trusted BaseURL
 	if err != nil {
 		return nil, fmt.Errorf("do http request: %w", err)
 	}
@@ -184,7 +194,11 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 		return nil, errors.New("ollama returned no image data")
 	}
 
-	imageData, err := base64.StdEncoding.DecodeString(resBody.Data[0].B64JSON)
+	b64Data := resBody.Data[0].B64JSON
+	if b64Data == "" {
+		return nil, errors.New("ollama returned empty b64_json image data")
+	}
+	imageData, err := base64.StdEncoding.DecodeString(b64Data)
 	if err != nil {
 		return nil, fmt.Errorf("decode b64_json: %w", err)
 	}
@@ -192,7 +206,7 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	part := &genai.Part{
 		InlineData: &genai.Blob{
 			Data:     imageData,
-			MIMEType: "image/png",
+			MIMEType: mimeType,
 		},
 	}
 	saveResp, err := ctx.Artifacts().Save(ctx, fileName, part)
