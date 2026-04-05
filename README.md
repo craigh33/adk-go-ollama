@@ -1,6 +1,6 @@
 <p align="center">
   <img
-    src="docs/images/readme-header.jpg"
+    src="docs/images/readme-header.jpeg"
     alt="adk-go-ollama banner showing Agent Development Kit connected to Ollama"
     width="100%"
   />
