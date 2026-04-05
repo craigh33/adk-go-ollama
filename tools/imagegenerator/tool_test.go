@@ -194,6 +194,18 @@ func TestRun(t *testing.T) {
 			expectErr:   true,
 			errContains: "invalid file_name provided",
 		},
+		{
+			name:        "invalid file name parent dir token",
+			args:        map[string]any{"prompt": "cat", "file_name": ".."},
+			expectErr:   true,
+			errContains: "invalid file_name provided",
+		},
+		{
+			name:        "invalid file name current dir token",
+			args:        map[string]any{"prompt": "cat", "file_name": "."},
+			expectErr:   true,
+			errContains: "invalid file_name provided",
+		},
 		{name: "missing prompt", args: map[string]any{}, expectErr: true, errContains: "prompt is required"},
 		{
 			name:        "server err",

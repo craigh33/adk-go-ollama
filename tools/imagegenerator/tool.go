@@ -155,7 +155,7 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	fileName = strings.TrimSpace(fileName)
 	if fileName != "" {
 		base := filepath.Base(fileName)
-		if base != fileName || base == "." || base == string(filepath.Separator) {
+		if base != fileName || base == "." || base == ".." || base == string(filepath.Separator) {
 			return nil, errors.New("invalid file_name provided")
 		}
 	} else {
@@ -192,7 +192,7 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	httpResp, err := t.httpClient.Do(httpReq) //nolint:gosec,nolintlint // trusted BaseURL
+	httpResp, err := t.httpClient.Do(httpReq) //nolint:gosec // trusted BaseURL
 	if err != nil {
 		return nil, fmt.Errorf("do http request: %w", err)
 	}
