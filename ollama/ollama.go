@@ -12,7 +12,7 @@ import (
 	"google.golang.org/adk/model"
 	"google.golang.org/genai"
 
-	"github.com/craigh33/adk-go-ollama/ollama/mappers"
+	"github.com/craigh33/adk-go-ollama/internal/mappers"
 )
 
 var _ model.LLM = (*Model)(nil)

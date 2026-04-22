@@ -84,7 +84,7 @@ agent, err := llmagent.New(llmagent.Config{
 
 `ollama.New` accepts a **model name** as recognized by your Ollama instance. `LLMRequest.Model` can override the model name at runtime.
 
-The [`ollama/mappers`](ollama/mappers/) package holds genai ↔ Ollama conversions (requests, responses, tools, usage). Import it if you need the same mappings outside the default [`ollama`](ollama/) package.
+The [`internal/mappers`](internal/mappers/) package holds genai ↔ Ollama conversions (requests, responses, tools, usage). It is internal to this module and used by the [`ollama`](ollama/) package.
 
 ## Examples
 
