@@ -31,6 +31,6 @@ body:
     id: scope
     attributes:
       label: Scope / compatibility notes
-      description: Bedrock models or regions involved, breaking-change concerns, links to Ollama or ADK docs if helpful.
+      description: Ollama model IDs involved, Ollama version, whether this is local or hosted/deployed, API compatibility concerns, breaking-change concerns, and links to Ollama or ADK docs if helpful.
     validations:
       required: false

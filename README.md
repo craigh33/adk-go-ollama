@@ -80,7 +80,7 @@ make -C examples/ollama-stream run
 
 ## Limitations
 
-- **Unsupported features**: Tool variants not supported by Ollama cause a request-time error. Advanced features that don't map cleanly may be ignored or return an explicit ADK error.
+- **Unsupported features**: Tool variants not supported by Ollama are not translated by the current chat mapper unless they are surfaced as function declarations. Advanced features that don't map cleanly may be ignored or return an explicit ADK error.
 - **Multimodal content**: Ollama natively only supports base64-encoded images. While the ADK can handle arbitrary blobs natively (like PDFs, documents, or spreadsheets), the `adk-go-ollama` provider will only process `genai.InlineData` as images via a vision model. Arbitrary file attachments are ignored or rejected by the Ollama API.
 - **Image generation**: Ollama's image generation feature currently only supports macOS and `x/flux2-klein:4b` (based on Flux architectures) and requires a large memory footprint (~12GB). It only supports single image generation requests at a fixed step count natively via `/v1/images/generations`.
 
