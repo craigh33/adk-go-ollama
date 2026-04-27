@@ -8,13 +8,14 @@
 
 # adk-go-ollama
 
-[Ollama](https://ollama.com/) implementation of the [`model.LLM`](https://pkg.go.dev/google.golang.org/adk/model#LLM) interface for [adk-go](https://github.com/google/adk-go), so you can run agents on local models like Llama 3, Mistral, and others with the same ADK APIs you use for Gemini.
+[Ollama](https://ollama.com/) **Chat** implementation of the [`model.LLM`](https://pkg.go.dev/google.golang.org/adk/model#LLM) interface for [adk-go](https://github.com/google/adk-go), so you can run agents on local models like Llama 3, Mistral, and others with the same ADK APIs you use for Gemini.
+
+**Other providers:** [adk-go-bedrock](https://github.com/craigh33/adk-go-bedrock) · [adk-go-kronk](https://github.com/craigh33/adk-go-kronk)
 
 ## Requirements
 
 - **Go** 1.25+ (aligned with `google.golang.org/adk`)
-- An instance of [Ollama](https://ollama.com/) running locally or accessible over the network
-- **[golangci-lint](https://golangci-lint.run/welcome/install/)** if you run `make lint` (uses [.golangci.yaml](.golangci.yaml))
+- **[Ollama](https://ollama.com/)** running locally or reachable over the network (default client URL `http://localhost:11434`; use [`ollama.WithBaseURL`](ollama/ollama.go) for a remote instance)
 
 ## Install
 
@@ -24,51 +25,9 @@ go get github.com/craigh33/adk-go-ollama
 
 Replace the module path with your fork or published path if you rename the module in `go.mod`.
 
-## Makefile
-
-| Target | Description |
-|--------|-------------|
-| `make test` | Run unit tests |
-| `make build` | Compile all packages |
-| `make lint` | Run `golangci-lint run ./...` |
-| `make pre-commit-install` | Install pre-commit hooks |
-
-## Contributing / Development
-
-### Pre-commit hooks
-
-This project uses [pre-commit](https://pre-commit.com) to enforce code quality and commit hygiene. The following tools must be available on your `PATH` before installing the hooks:
-
-| Tool | Purpose | Install |
-|------|---------|---------|
-| [pre-commit](https://pre-commit.com) | Hook framework | `brew install pre-commit` |
-| [golangci-lint](https://golangci-lint.run/welcome/install/) | Go linter (runs `make lint`) | `brew install golangci-lint` |
-| [gitleaks](https://github.com/gitleaks/gitleaks) | Secret / credential scanner | `brew install gitleaks` |
-
-Once the tools are installed, wire the hooks into your local clone:
-
-```bash
-make pre-commit-install
-```
-
-This installs hooks for both the `pre-commit` stage and the `commit-msg` stage.
-
-#### What the hooks do
-
-| Hook | Stage | Description |
-|------|-------|-------------|
-| `trailing-whitespace` | pre-commit | Strips trailing whitespace |
-| `end-of-file-fixer` | pre-commit | Ensures files end with a newline |
-| `check-yaml` | pre-commit | Validates YAML syntax |
-| `no-commit-to-branch` | pre-commit | Prevents direct commits to `main` |
-| `conventional-pre-commit` | commit-msg | Enforces [Conventional Commits](https://www.conventionalcommits.org/) message format (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`) |
-| `golangci-lint` | pre-commit | Runs `make lint` against all Go files |
-| `gitleaks` | pre-commit | Scans staged diff for secrets/credentials |
-
 ## Usage
 
 ```go
-ctx := context.Background()
 m, err := ollama.New("gemma3")
 if err != nil {
     log.Fatal(err)
@@ -82,7 +41,7 @@ agent, err := llmagent.New(llmagent.Config{
 // Wire agent into runner.New(...) as usual.
 ```
 
-`ollama.New` accepts a **model name** as recognized by your Ollama instance. `LLMRequest.Model` can override the model name at runtime.
+`ollama.New` accepts a **model name** as recognized by your Ollama instance. [`LLMRequest.Model`](https://pkg.go.dev/google.golang.org/adk/model#LLMRequest) can override the model name at runtime (e.g. from ADK callbacks).
 
 The [`internal/mappers`](internal/mappers/) package holds genai ↔ Ollama conversions (requests, responses, tools, usage). It is internal to this module and used by the [`ollama`](ollama/) package.
 
@@ -97,16 +56,11 @@ Each example has its own `README.md` and `Makefile`:
 - [`examples/ollama-multimodal`](examples/ollama-multimodal): image analysis and multi-image comparison using vision models like `llava`.
 - [`examples/ollama-web-ui`](examples/ollama-web-ui): ADK local web UI launcher to interact with your Ollama agent.
 
-To run the examples, you can override the default model using the `OLLAMA_MODEL` environment variable.
+All examples assume Ollama is reachable at the default URL and optionally use **`OLLAMA_MODEL`** to override the default chat model. The image generation example also supports **`OLLAMA_IMAGE_MODEL`** for the Flux image model.
 
 ```bash
+export OLLAMA_MODEL=llama3.3
 make -C examples/ollama-chat run
-```
-
-Run tool calling example:
-
-```bash
-make -C examples/ollama-tool-calling run
 ```
 
 Run streaming example:
@@ -117,16 +71,25 @@ make -C examples/ollama-stream run
 
 ## How it maps to Ollama
 
-- **Messages**: `genai` roles `user` and `model` map to Ollama `user` and `assistant`. System instructions are sent as `system` messages.
-- **Tools**: the mapper converts `GenerateContentConfig.Tools` entries (specifically `FunctionDeclarations`).
-- **Streaming**: When ADK uses SSE streaming, the provider streams the response and yields partial outputs, buffering until the final usage metadata is returned.
+- **Messages**: `genai` roles `user` and `model` map to Ollama `user` and `assistant`. Optional `system` role entries in the conversation are mapped to Ollama `system` messages.
+- **System instruction**: `GenerateContentConfig.SystemInstruction` is sent as Ollama system content ahead of the conversation turns.
+- **Tools**: the mapper converts `GenerateContentConfig.Tools` entries whose **`FunctionDeclarations`** are present into Ollama function tools. Other `genai.Tool` variants are not translated to Ollama's chat API (use ADK patterns such as `mcptoolset` if you need MCP tools surfaced as function declarations).
+- **Function responses**: JSON tool output is mapped to Ollama `tool` role messages with the corresponding tool name and call ID.
+- **Streaming**: When ADK uses SSE streaming, the provider streams the chat response and yields partial outputs, buffering until usage metadata completes the turn.
+- **Multimodal user content**: Inline image data on user turns is mapped to Ollama image payloads where the model supports vision; other media types follow the constraints described under [Limitations](#limitations).
 
 ## Limitations
 
-- **Unsupported features**: Tool variants not supported by Ollama cause a request-time error. Advanced features that don't map cleanly may be ignored or return an explicit ADK error.
-- **Multimodal Content**: Ollama natively only supports base64-encoded images. While the ADK can handle arbitrary blobs natively (like PDFs, Documents, or Spreadsheets), the `adk-go-ollama` provider will only process `genai.InlineData` as images via a vision model. Arbitrary file attachments are ignored or rejected by the Ollama API.
-- **Image Generation**: Ollama's image generation feature currently only supports macOS and `x/flux2-klein:4b` (based on Flux architectures) and requires a large memory footprint (~12GB). It only supports single image generation requests at a fixed step count natively via `/v1/images/generations`.
+- **Unsupported features**: Tool variants not supported by Ollama are not translated by the current chat mapper unless they are surfaced as function declarations. Advanced features that don't map cleanly may be ignored or return an explicit ADK error.
+- **Multimodal content**: Ollama natively only supports base64-encoded images. While the ADK can handle arbitrary blobs natively (like PDFs, documents, or spreadsheets), the `adk-go-ollama` provider will only process `genai.InlineData` as images via a vision model. Arbitrary file attachments are ignored or rejected by the Ollama API.
+- **Image generation**: Ollama's image generation feature currently only supports macOS and `x/flux2-klein:4b` (based on Flux architectures) and requires a large memory footprint (~12GB). It only supports single image generation requests at a fixed step count natively via `/v1/images/generations`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for Makefile targets, required pre-commit setup, commit message conventions, and pull request guidelines. For new issues, use the [bug report](https://github.com/craigh33/adk-go-ollama/issues/new?template=bug_report.yml) or [feature request](https://github.com/craigh33/adk-go-ollama/issues/new?template=feature_request.yml) templates.
 
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
+
+[Contributing](CONTRIBUTING.md) · [Issues](https://github.com/craigh33/adk-go-ollama/issues) · [Security](https://github.com/craigh33/adk-go-ollama/security)
