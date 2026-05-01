@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/ollama/ollama v0.22.1
 	google.golang.org/adk v1.2.0
-	google.golang.org/genai v1.54.0
+	google.golang.org/genai v1.55.0
 )
 
 require (
