@@ -1,9 +1,9 @@
 module github.com/craigh33/adk-go-ollama
 
-go 1.25.0
+go 1.26.0
 
 require (
-	github.com/ollama/ollama v0.22.1
+	github.com/ollama/ollama v0.23.2
 	google.golang.org/adk v1.2.0
 	google.golang.org/genai v1.55.0
 )
