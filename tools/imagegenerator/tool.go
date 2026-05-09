@@ -24,6 +24,17 @@ const DefaultModelID = "x/flux2-klein:4b"
 // DefaultBaseURL is the default API URL for the local Ollama instance.
 const DefaultBaseURL = "http://localhost:11434"
 
+const (
+	argPrompt   = "prompt"
+	argFileName = "file_name"
+	argSize     = "size"
+
+	schemaTypeObject = "object"
+	schemaTypeString = "string"
+
+	statusSuccess = "success"
+)
+
 // Config configures the image generator tool.
 type Config struct {
 	BaseURL    string // e.g., "http://localhost:11434"
@@ -80,22 +91,22 @@ func (t *imageGenTool) Declaration() *genai.FunctionDeclaration {
 		Name:        t.Name(),
 		Description: t.Description(),
 		Parameters: &genai.Schema{
-			Type: "object",
+			Type: schemaTypeObject,
 			Properties: map[string]*genai.Schema{
-				"prompt": {
-					Type:        "string",
+				argPrompt: {
+					Type:        schemaTypeString,
 					Description: "The text prompt describing the image to generate",
 				},
-				"file_name": {
-					Type:        "string",
+				argFileName: {
+					Type:        schemaTypeString,
 					Description: "The filename to save the generated image as (e.g. 'landscape.png')",
 				},
-				"size": {
-					Type:        "string",
+				argSize: {
+					Type:        schemaTypeString,
 					Description: "Image dimensions (WxH). Defaults to 1024x1024.",
 				},
 			},
-			Required: []string{"prompt"},
+			Required: []string{argPrompt},
 		},
 	}
 }
@@ -147,11 +158,11 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 		return nil, fmt.Errorf("unexpected args type: %T", args)
 	}
 
-	prompt, _ := m["prompt"].(string)
+	prompt, _ := m[argPrompt].(string)
 	if prompt == "" {
 		return nil, errors.New("prompt is required")
 	}
-	fileName, _ := m["file_name"].(string)
+	fileName, _ := m[argFileName].(string)
 	fileName = strings.TrimSpace(fileName)
 	if fileName != "" {
 		base := filepath.Base(fileName)
@@ -165,7 +176,7 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	if mimeType == "" {
 		mimeType = "image/png"
 	}
-	size, _ := m["size"].(string)
+	size, _ := m[argSize].(string)
 	if size == "" {
 		size = "1024x1024"
 	}
@@ -232,9 +243,9 @@ func (t *imageGenTool) Run(ctx tool.Context, args any) (map[string]any, error) {
 	}
 
 	return map[string]any{
-		"file_name": fileName,
+		argFileName: fileName,
 		"version":   saveResp.Version,
-		"status":    "success",
+		"status":    statusSuccess,
 	}, nil
 }
 
