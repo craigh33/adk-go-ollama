@@ -6,6 +6,12 @@ import (
 	"google.golang.org/genai"
 )
 
+const (
+	doneReasonStop   = "stop"
+	doneReasonLength = "length"
+	doneReasonLoad   = "load"
+)
+
 // LLMResponseFromChatResponse maps an Ollama ChatResponse to an ADK LLMResponse.
 func LLMResponseFromChatResponse(resp *ollamaapi.ChatResponse, partial bool) *model.LLMResponse {
 	if resp == nil {
@@ -57,7 +63,7 @@ func FinalLLMResponseFromStream(doneResp *ollamaapi.ChatResponse, accumulatedTex
 
 	resp := &model.LLMResponse{
 		Content: &genai.Content{
-			Role:  "model",
+			Role:  genaiRoleModel,
 			Parts: parts,
 		},
 		TurnComplete: true,
@@ -76,7 +82,7 @@ func contentFromMessage(msg *ollamaapi.Message) *genai.Content {
 	if len(parts) == 0 {
 		parts = []*genai.Part{{Text: ""}}
 	}
-	return &genai.Content{Role: "model", Parts: parts}
+	return &genai.Content{Role: genaiRoleModel, Parts: parts}
 }
 
 func partsFromMessage(msg *ollamaapi.Message) []*genai.Part {
@@ -111,11 +117,11 @@ func FunctionCallFromToolCall(tc *ollamaapi.ToolCall) *genai.FunctionCall {
 // FinishReasonFromDoneReason maps Ollama done reasons to genai finish reasons.
 func FinishReasonFromDoneReason(reason string) genai.FinishReason {
 	switch reason {
-	case "stop":
+	case doneReasonStop:
 		return genai.FinishReasonStop
-	case "length":
+	case doneReasonLength:
 		return genai.FinishReasonMaxTokens
-	case "load":
+	case doneReasonLoad:
 		return genai.FinishReasonOther
 	default:
 		return genai.FinishReasonStop
