@@ -3,7 +3,7 @@ module github.com/craigh33/adk-go-ollama
 go 1.26.0
 
 require (
-	github.com/ollama/ollama v0.23.2
+	github.com/ollama/ollama v0.24.0
 	google.golang.org/adk v1.2.0
 	google.golang.org/genai v1.56.0
 )
