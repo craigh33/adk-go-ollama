@@ -15,7 +15,6 @@ import (
 	"google.golang.org/adk/artifact"
 	"google.golang.org/adk/memory"
 	"google.golang.org/adk/session"
-	"google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/toolconfirmation"
 	"google.golang.org/genai"
 )
@@ -41,7 +40,7 @@ func (m *mockArtifacts) LoadVersion(ctx context.Context, name string, version in
 	return nil, errNotImplemented
 }
 
-// mockContext implements tool.Context.
+// mockContext implements agent.ToolContext.
 type mockContext struct {
 	ctx       context.Context
 	artifacts agent.Artifacts
@@ -53,7 +52,7 @@ func (m *mockContext) Done() <-chan struct{}       { return m.ctx.Done() }
 func (m *mockContext) Err() error                  { return m.ctx.Err() }
 func (m *mockContext) Value(key any) any           { return m.ctx.Value(key) }
 
-// tool.Context methods.
+// agent.ToolContext methods.
 func (m *mockContext) Artifacts() agent.Artifacts     { return m.artifacts }
 func (m *mockContext) FunctionCallID() string         { return "" }
 func (m *mockContext) Actions() *session.EventActions { return nil }
@@ -236,7 +235,7 @@ func TestRun(t *testing.T) {
 			mCtx := &mockContext{ctx: context.Background(), artifacts: mArt}
 
 			resp, err := toolImpl.(interface {
-				Run(tool.Context, any) (map[string]any, error)
+				Run(agent.ToolContext, any) (map[string]any, error)
 			}).Run(mCtx, tt.args)
 
 			verifyError(t, err, tt.expectErr, tt.errContains)
