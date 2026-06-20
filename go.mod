@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/ollama/ollama v0.30.7
 	google.golang.org/adk v1.4.0
-	google.golang.org/genai v1.60.0
+	google.golang.org/genai v1.61.0
 )
 
 require (
