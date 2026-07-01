@@ -9,13 +9,9 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
-	"google.golang.org/adk/agent"
-	"google.golang.org/adk/artifact"
-	"google.golang.org/adk/memory"
-	"google.golang.org/adk/session"
-	"google.golang.org/adk/tool/toolconfirmation"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/artifact"
 	"google.golang.org/genai"
 )
 
@@ -40,36 +36,13 @@ func (m *mockArtifacts) LoadVersion(ctx context.Context, name string, version in
 	return nil, errNotImplemented
 }
 
-// mockContext implements agent.ToolContext.
+// mockContext implements agent.Context for the methods used by the image tool.
 type mockContext struct {
-	ctx       context.Context
+	agent.StrictContextMock
 	artifacts agent.Artifacts
 }
 
-// Context methods.
-func (m *mockContext) Deadline() (time.Time, bool) { return m.ctx.Deadline() }
-func (m *mockContext) Done() <-chan struct{}       { return m.ctx.Done() }
-func (m *mockContext) Err() error                  { return m.ctx.Err() }
-func (m *mockContext) Value(key any) any           { return m.ctx.Value(key) }
-
-// agent.ToolContext methods.
-func (m *mockContext) Artifacts() agent.Artifacts     { return m.artifacts }
-func (m *mockContext) FunctionCallID() string         { return "" }
-func (m *mockContext) Actions() *session.EventActions { return nil }
-func (m *mockContext) SearchMemory(context.Context, string) (*memory.SearchResponse, error) {
-	return nil, errNotImplemented
-}
-func (m *mockContext) ToolConfirmation() *toolconfirmation.ToolConfirmation { return nil }
-func (m *mockContext) RequestConfirmation(hint string, payload any) error   { return nil }
-func (m *mockContext) UserContent() *genai.Content                          { return nil }
-func (m *mockContext) InvocationID() string                                 { return "" }
-func (m *mockContext) AgentName() string                                    { return "" }
-func (m *mockContext) ReadonlyState() session.ReadonlyState                 { return nil }
-func (m *mockContext) UserID() string                                       { return "" }
-func (m *mockContext) AppName() string                                      { return "" }
-func (m *mockContext) SessionID() string                                    { return "" }
-func (m *mockContext) Branch() string                                       { return "" }
-func (m *mockContext) State() session.State                                 { return nil }
+func (m *mockContext) Artifacts() agent.Artifacts { return m.artifacts }
 
 func mockServerHandler(w http.ResponseWriter, r *http.Request) {
 	var req imageRequest
@@ -232,10 +205,10 @@ func TestRun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mArt := &mockArtifacts{}
-			mCtx := &mockContext{ctx: context.Background(), artifacts: mArt}
+			mCtx := &mockContext{StrictContextMock: agent.NewStrictContextMock(context.Background()), artifacts: mArt}
 
 			resp, err := toolImpl.(interface {
-				Run(agent.ToolContext, any) (map[string]any, error)
+				Run(agent.Context, any) (map[string]any, error)
 			}).Run(mCtx, tt.args)
 
 			verifyError(t, err, tt.expectErr, tt.errContains)

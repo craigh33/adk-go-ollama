@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 
 	"github.com/craigh33/adk-go-ollama/ollama"
