@@ -39,6 +39,7 @@ func (m *mockArtifacts) LoadVersion(ctx context.Context, name string, version in
 // mockContext implements agent.Context for the methods used by the image tool.
 type mockContext struct {
 	agent.StrictContextMock
+
 	artifacts agent.Artifacts
 }
 
