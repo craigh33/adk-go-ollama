@@ -8,13 +8,13 @@
 
 # adk-go-ollama
 
-[Ollama](https://ollama.com/) **Chat** implementation of the [`model.LLM`](https://pkg.go.dev/google.golang.org/adk/model#LLM) interface for [adk-go](https://github.com/google/adk-go), so you can run agents on local models like Llama 3, Mistral, and others with the same ADK APIs you use for Gemini.
+[Ollama](https://ollama.com/) **Chat** implementation of the [`model.LLM`](https://pkg.go.dev/google.golang.org/adk/v2/model#LLM) interface for [adk-go](https://github.com/google/adk-go), so you can run agents on local models like Llama 3, Mistral, and others with the same ADK APIs you use for Gemini.
 
 **Other providers:** [adk-go-bedrock](https://github.com/craigh33/adk-go-bedrock) · [adk-go-kronk](https://github.com/craigh33/adk-go-kronk)
 
 ## Requirements
 
-- **Go** 1.25+ (aligned with `google.golang.org/adk`)
+- **Go** 1.25+ (aligned with `google.golang.org/adk/v2`)
 - **[Ollama](https://ollama.com/)** running locally or reachable over the network (default client URL `http://localhost:11434`; use [`ollama.WithBaseURL`](ollama/ollama.go) for a remote instance)
 
 ## Install
@@ -41,7 +41,7 @@ agent, err := llmagent.New(llmagent.Config{
 // Wire agent into runner.New(...) as usual.
 ```
 
-`ollama.New` accepts a **model name** as recognized by your Ollama instance. [`LLMRequest.Model`](https://pkg.go.dev/google.golang.org/adk/model#LLMRequest) can override the model name at runtime (e.g. from ADK callbacks).
+`ollama.New` accepts a **model name** as recognized by your Ollama instance. [`LLMRequest.Model`](https://pkg.go.dev/google.golang.org/adk/v2/model#LLMRequest) can override the model name at runtime (e.g. from ADK callbacks).
 
 The [`internal/mappers`](internal/mappers/) package holds genai ↔ Ollama conversions (requests, responses, tools, usage). It is internal to this module and used by the [`ollama`](ollama/) package.
 

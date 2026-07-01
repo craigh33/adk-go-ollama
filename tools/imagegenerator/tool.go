@@ -13,9 +13,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"google.golang.org/adk/agent"
-	"google.golang.org/adk/model"
-	"google.golang.org/adk/tool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/model"
+	"google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 )
 
@@ -114,7 +114,7 @@ func (t *imageGenTool) Declaration() *genai.FunctionDeclaration {
 
 // ProcessRequest packs the tool declaration into the LLM request so the model
 // can discover and invoke it.
-func (t *imageGenTool) ProcessRequest(_ agent.ToolContext, req *model.LLMRequest) error {
+func (t *imageGenTool) ProcessRequest(_ agent.Context, req *model.LLMRequest) error {
 	if req.Tools == nil {
 		req.Tools = make(map[string]any)
 	}
@@ -153,7 +153,7 @@ func (t *imageGenTool) ProcessRequest(_ agent.ToolContext, req *model.LLMRequest
 // then persists the resulting image as an artifact via Artifacts().Save.
 //
 //nolint:funlen // Tool execution coordinates multiple steps
-func (t *imageGenTool) Run(ctx agent.ToolContext, args any) (map[string]any, error) {
+func (t *imageGenTool) Run(ctx agent.Context, args any) (map[string]any, error) {
 	m, ok := args.(map[string]any)
 	if !ok {
 		return nil, fmt.Errorf("unexpected args type: %T", args)
