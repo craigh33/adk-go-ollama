@@ -1,11 +1,11 @@
 module github.com/craigh33/adk-go-ollama
 
-go 1.26.0
+go 1.26.5
 
 require (
-	github.com/ollama/ollama v0.32.1
-	google.golang.org/adk/v2 v2.0.0
-	google.golang.org/genai v1.64.0
+	github.com/ollama/ollama v0.32.5
+	google.golang.org/adk/v2 v2.1.0
+	google.golang.org/genai v1.65.0
 )
 
 require github.com/google/jsonschema-go v0.4.2 // indirect
