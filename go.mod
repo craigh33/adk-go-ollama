@@ -4,7 +4,7 @@ go 1.26.10
 
 require (
 	github.com/ollama/ollama v0.40.14
-	google.golang.org/adk/v2 v2.7.0
+	google.golang.org/adk/v2 v2.7.1
 	google.golang.org/genai v1.77.0
 )
 
