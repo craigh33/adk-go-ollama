@@ -5,7 +5,7 @@ go 1.26.10
 require (
 	github.com/ollama/ollama v0.40.14
 	google.golang.org/adk/v2 v2.7.0
-	google.golang.org/genai v1.77.0
+	google.golang.org/genai v1.79.1
 )
 
 require github.com/google/jsonschema-go v0.4.3 // indirect
